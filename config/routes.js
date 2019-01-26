@@ -1,5 +1,7 @@
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
 
+const db = require('../database/dbConfig');
 const { authenticate } = require('../auth/authenticate');
 
 module.exports = server => {
@@ -10,6 +12,12 @@ module.exports = server => {
 
 function register(req, res) {
   // implement user registration
+  const user = req.body;
+  user.password = bcrypt.hashSync(user.password);
+  db('users')
+    .insert(user)
+    .then(ids => res.status(201).json({ id: ids[0] }))
+    .catch(err => res.status(500).json(err));
 }
 
 function login(req, res) {
